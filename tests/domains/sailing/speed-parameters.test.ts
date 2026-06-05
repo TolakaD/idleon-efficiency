@@ -11,9 +11,9 @@ import { PlayerStatues } from '../../../data/domain/world-1/statues';
 import { Cooking } from '../../../data/domain/world-4/cooking';
 import { Rift, SkillMastery } from '../../../data/domain/world-4/rift';
 import { Worship, TotalizerBonus } from '../../../data/domain/world-3/worship';
-import { StarSigns } from '../../../data/domain/starsigns';
 import { SkillsIndex } from '../../../data/domain/SkillsIndex';
 import { SlabInfluencedArtifact } from '../../../data/domain/world-5/sailing/artifacts';
+import { Player } from '../../../data/domain/player';
 
 // TODO: Make it possible to test multiple save / extraction results.
 const saveName = 'latest';
@@ -155,8 +155,8 @@ const sailingSpeedParameterSpecs: Record<string, ParameterTestSpec> = {
     description: 'Star sign 63 (C. Shanti Minor) bonus',
     extractionKey: 'starsign_63_bonus',
     domainExtractor: (gameData) => {
-      const starSigns = gameData.get("starsigns") as StarSigns;
-      return starSigns.unlockedStarSigns.find(sign => sign.name == "C. Shanti Minor")?.getBonus("Sailing SPD") ?? 0;
+      const players = gameData.get("players") as Player[];
+      return players[0].starSigns.find(sign => sign.name == "C. Shanti Minor")?.getBonus("Sailing SPD") ?? 0;
     }
   }
 };
