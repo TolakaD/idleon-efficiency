@@ -25,6 +25,11 @@ import { Grimoire } from "../grimoire";
 import { LegendTalents } from "../world-7/legendTalents";
 import { Emperor } from "./emperor";
 
+// TODO: This is a temporary solution until proper Exotic Market implementation
+const exoticMarketBonusData: Record<number, { bonusPerLevel: number, diminishing: boolean }> = {
+    48: { bonusPerLevel: 2, diminishing: true }, // Prisma Bubble Bonus
+};
+
 export class LandRankDataBase {
     unlocked: boolean = false;
     upgrades: LandRankUpgrade[] = [];
@@ -499,6 +504,7 @@ export class Farming extends Domain {
     growthRate: number = 0;
     magicBeansFromDepot: number = 0;
     discoveredCrops: number = 0;
+    exoticMarketLevels: number[] = [];
     marketCostMultiplier: number = 1;
 
     cropNames = ["Apple", "Orange", "Lemon", "Pear", "Strawberry", "Bananas", "Blueberry", "Red Grapes", "Red Pear", "Pineapple", "Lime", "Raspberry", "Fig", "Peach", "Purple Grapes", "Yellow Pear", "Watermelon", "Green Grapes", "Dragon Fruit", "Mango", "Gold Blueberry",
@@ -538,6 +544,7 @@ export class Farming extends Domain {
         }
 
         const upgradesLevels = upgradesData.slice(2, -2);
+        farming.exoticMarketLevels = upgradesData.slice(20, 100);
 
         farming.magicBeansOwned = upgradesData[1];
         farming.instaGrowToolLeft = upgradesData[19];
@@ -731,6 +738,20 @@ export class Farming extends Domain {
         } else {
             return 0;
         }
+    }
+
+    getExoticMarketBonusValue = (bonusId: number): number => {
+        const bonusData = exoticMarketBonusData[bonusId];
+        if (!bonusData) {
+            return 0;
+        }
+
+        const level = this.exoticMarketLevels[bonusId] ?? 0;
+        if (bonusData.diminishing) {
+            return bonusData.bonusPerLevel * (level / (1000 + level));
+        }
+
+        return bonusData.bonusPerLevel * level;
     }
 
     getMarketUpgradeBonusText = (upgradeId: number): string => {
