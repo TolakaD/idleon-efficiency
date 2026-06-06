@@ -668,7 +668,7 @@ export class Tesseract extends Domain implements EfficiencyDomain {
             upgrade.costReductionFactor = costReductionFactor;
             upgrade.bonus = upgrade.getBonus(tesseract.upgrades);
             upgrade.cost = upgrade.getCost(tesseract.upgrades);
-            upgrade.costToMax = upgrade.getCostToMax(tesseract.upgrades);
+            upgrade.costToMax = upgrade.getMaxLevel() >= 999999 ? 0 : upgrade.getCostToMax(tesseract.upgrades);
         });
 
 
