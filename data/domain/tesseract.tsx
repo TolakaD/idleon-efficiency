@@ -90,6 +90,11 @@ export class TesseractUpgrade implements EfficiencyUpgrade {
     }
 
     getCostToMax = (allUpgrades: TesseractUpgrade[]): number => {
+        // Don't calculate cost to max for uncapped upgrades
+        if (this.getMaxLevel() >= 999999) {
+            return 0;
+        }
+
         let totalCost = 0;
         const tempUpgrade = this.copyUpgrade() as TesseractUpgrade;
 
@@ -668,7 +673,7 @@ export class Tesseract extends Domain implements EfficiencyDomain {
             upgrade.costReductionFactor = costReductionFactor;
             upgrade.bonus = upgrade.getBonus(tesseract.upgrades);
             upgrade.cost = upgrade.getCost(tesseract.upgrades);
-            upgrade.costToMax = upgrade.getMaxLevel() >= 999999 ? 0 : upgrade.getCostToMax(tesseract.upgrades);
+            upgrade.costToMax = upgrade.getCostToMax(tesseract.upgrades);
         });
 
 
