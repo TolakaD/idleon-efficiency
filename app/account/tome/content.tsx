@@ -91,7 +91,7 @@ function TomeDisplay() {
                     </Box>
                     <Grid columns={{ size: 'auto', count: 2 }} gap='small'>
                         {
-                            tome.lines.slice().sort((line1, line2) => line1.displayOrder > line2.displayOrder ? 1 : -1).map((line, index) => <LineDisplay key={index} line={line} playerIndex={tome.highestScoreIndex} totalAccountLevel={tome.totalAccountLevel} />)
+                            tome.lines.map((line, index) => <LineDisplay key={index} line={line} playerIndex={tome.highestScoreIndex} totalAccountLevel={tome.totalAccountLevel} />)
                         }
                     </Grid>
                 </Box>

@@ -81,7 +81,7 @@ export class TomeLine {
     private lineScores: number[] = [];
     unlocked: boolean = false;
 
-    constructor(public index: number, public data: TomeModel, public displayOrder: number = 0, charCount: number) {
+    constructor(public index: number, public data: TomeModel, charCount: number) {
         for (let i = 0; i < charCount; i++) {
             // 1000 is the default value for lines that are supposed to be "the lowest the better"
             this.currentValues.push(data.scalingType == TomeScalingEnum.inverseDecay ? 1000 : 0);
@@ -117,6 +117,10 @@ export class TomeLine {
             default:
                 return 0;
         }
+    }
+
+    getDisplayOrder = (): number => {
+        return this.data.uiPositionIndex;
     }
 
     getLineDescription = (): string => {
@@ -197,7 +201,8 @@ export class TomeLine {
     }
 
     getLineUnlockLevel = (): number => {
-        return (500 + (50 * this.displayOrder + (10 * Math.max(0, this.displayOrder - 30) + 10 * Math.max(0, this.displayOrder - 50))));
+        const displayOrder = this.getDisplayOrder()
+        return (500 + (50 * displayOrder + (10 * Math.max(0, displayOrder - 30) + 10 * Math.max(0, displayOrder - 50))));
     }
 
     updateIsLineUnlocked = (accountTotalLevel: number) => {
@@ -261,11 +266,9 @@ export class Tome extends Domain {
             tome.scoreThresholds = serverVars["TomePct"] as number[];
         }
 
-        tome.lines = [];
-        const tomeLinesBase = initTomeRepo();
-        tomeLinesBase.forEach(lineInfo => {
-            tome.lines.push(new TomeLine(lineInfo.index, lineInfo.data, tomeLineDisplayOrder.indexOf(lineInfo.index), tome.charCount));
-        });
+        tome.lines = initTomeRepo()
+            .map(lineInfo => new TomeLine(lineInfo.index, lineInfo.data, tome.charCount))
+            .sort((line1, line2) => line1.getDisplayOrder() - line2.getDisplayOrder());
 
         // Protect against old accounts.
         if (!spelunk || spelunk.length == 0) {
@@ -1061,123 +1064,3 @@ export const updateTomeScores = (data: Map<string, any>) => {
         bonus.boostFromBonuses = grimoireBonus + equipmentSetBonus;
     });
 }
-
-// engine.getGameAttribute("CustomLists").h.NinjaInfo[32]
-const tomeLineDisplayOrder = [
-    5,
-    11,
-    3,
-    65,
-    22,
-    0,
-    2,
-    1,
-    7,
-    4,
-    6,
-    81,
-    8,
-    9,
-    53,
-    10,
-    107,
-    109,
-    12,
-    113,
-    106,
-    75,
-    13,
-    14,
-    80,
-    79,
-    25,
-    15,
-    16,
-    17,
-    18,
-    19,
-    21,
-    23,
-    24,
-    26,
-    27,
-    28,
-    29,
-    85,
-    86,
-    108,
-    30,
-    31,
-    32,
-    33,
-    34,
-    35,
-    37,
-    36,
-    76,
-    38,
-    54,
-    40,
-    41,
-    42,
-    39,
-    44,
-    50,
-    48,
-    46,
-    47,
-    49,
-    51,
-    52,
-    45,
-    55,
-    60,
-    57,
-    61,
-    62,
-    66,
-    59,
-    64,
-    63,
-    111,
-    58,
-    56,
-    93,
-    84,
-    83,
-    92,
-    91,
-    87,
-    88,
-    89,
-    82,
-    94,
-    68,
-    69,
-    67,
-    77,
-    78,
-    112,
-    72,
-    74,
-    99,
-    71,
-    70,
-    73,
-    96,
-    20,
-    43,
-    90,
-    100,
-    101,
-    95,
-    97,
-    103,
-    104,
-    98,
-    102,
-    105,
-    110,
-    114,
-    115
-]
