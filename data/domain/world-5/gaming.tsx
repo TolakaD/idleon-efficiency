@@ -6,20 +6,41 @@ import { Domain, RawData } from "../base/domain";
 import { Bribe } from "../world-1/bribes";
 import { Construction } from "../world-3/construction/construction";
 import { GamingBoxBase, initGamingBoxRepo } from "../data/GamingBoxRepo";
+import { GamingPaletteBase, initGamingPaletteRepo } from "../data/GamingPaletteRepo";
 import { GamingSuperbitBase, initGamingSuperbitsRepo } from "../data/GamingSuperbitsRepo";
 import { GamingUpgradeBase, initGamingUpgradeRepo } from "../data/GamingUpgradeRepo";
 import { Equinox, MetalDetector } from "../world-3/equinox";
 import { IslandExpeditions } from "../world-2/islandExpedition";
 import { Item } from "../items";
 import { GamingBoxModel } from "../model/gamingBoxModel";
+import { GamingPaletteModel } from "../model/gamingPaletteModel";
 import { GamingSuperbitModel } from "../model/gamingSuperbitModel";
 import { GamingUpgradeModel } from "../model/gamingUpgradeModel";
+import { LegendTalents } from "../world-7/legendTalents";
 
 export class GamingUpgrade {
     constructor(public index: number, public data: GamingUpgradeModel) { }
 
     static fromBase = (data: GamingUpgradeBase[]): GamingUpgrade[] => {
         return data.map(box => new GamingUpgrade(box.index, box.data))
+    }
+}
+
+export class GamingPaletteColor {
+    level: number = 0;
+
+    constructor(public index: number, public data: GamingPaletteModel) { }
+
+    static fromBase = (data: GamingPaletteBase[]): GamingPaletteColor[] => {
+        return data.map(color => new GamingPaletteColor(color.index, color.data))
+    }
+
+    getBaseBonus = (): number => {
+        if (this.data.usesDecay == 1) {
+            return (this.level / (this.level + 25)) * this.data.bonusValue;
+        }
+
+        return this.level * this.data.bonusValue;
     }
 }
 
@@ -99,12 +120,18 @@ export class Gaming extends Domain {
     importBoxes: ImportBox[] = ImportBox.fromBase(initGamingBoxRepo());
     upgrades: GamingUpgrade[] = GamingUpgrade.fromBase(initGamingUpgradeRepo());
     superbits: Superbits[] = Superbits.fromBase(initGamingSuperbitsRepo());
+    paletteColors: GamingPaletteColor[] = GamingPaletteColor.fromBase(initGamingPaletteRepo());
     rawGamingData: any[] = [];
     rawSproutData: number[][] = [];
 
     biggestGoldNugget: number = 0;
 
     currenBitsOwned: number = 0;
+
+    totalPaletteLevels: number = 0;
+    paletteBonusMultiplier: number = 1;
+    paletteLegendTalentBonusMultiplier: number = 1;
+    paletteLoreBonusMultiplier: number = 1;
 
     equinoxBonusToNuggets: number = 1;
 
@@ -145,10 +172,34 @@ export class Gaming extends Domain {
         return [minStat, maxStat];
     }
 
+    getPaletteBonus = (index: number): number => {
+        const color = this.paletteColors[index];
+        if (!color) {
+            return 0;
+        }
+
+        const specificSuperbitBoosts: Record<number, number> = {
+            25: 49, // Double 'Peachy Pink' bonus
+            13: 51, // Double 'Ocean Blue' bonus
+            31: 52, // Double 'Red Orange' bonus
+            18: 54, // Double 'Offwhite' bonus
+            3: 58, // Double 'Neon Tree'
+            12: 61, // Double 'Babby Blue' bonus
+        };
+        const specificBoostSuperbit = specificSuperbitBoosts[index];
+        // Superbit superbits[59] is "Colourier Colours" which makes superbit doublers give 2.5x bonus
+        const specificBoostMultiplier = specificBoostSuperbit != undefined && this.superbits[specificBoostSuperbit]?.unlocked
+            ? 2 + 0.5 * (this.superbits[59]?.unlocked ? 1 : 0)
+            : 1;
+
+        return color.getBaseBonus() * specificBoostMultiplier * this.paletteBonusMultiplier;
+    }
+
     getRawKeys(): RawData[] {
         return [
             {key: "Gaming", perPlayer: false, default: []},
             {key: "GamingSprout", perPlayer: false, default: []},
+            {key: "Spelunk", perPlayer: false, default: []},
             {key: "Lv0_", perPlayer: true, default: []},
         ]
     }
@@ -162,6 +213,7 @@ export class Gaming extends Domain {
         const charCount = data.get("charCount") as number;
         const gamingData = data.get("Gaming") as any[] || [];
         const gamingSproutData = data.get("GamingSprout") as number[][];
+        const spelunkingData = data.get("Spelunk") as any[][] || [];
         const playerSkillLevels = range(0, charCount).map((_, i) => { return data.get(`Lv0_${i}`) }) as number[][];
         const optionList = data.get("OptLacc") as number[];
 
@@ -177,6 +229,14 @@ export class Gaming extends Domain {
         gaming.currenBitsOwned = gamingData[0] ?? 0;
 
         gaming.level = playerSkillLevels.reduce((max, player) => max = Math.max(max, player[SkillsIndex.Gaming]), 0);
+
+        const paletteLevels = (spelunkingData[9] as number[]) || [];
+        gaming.totalPaletteLevels = 0;
+        gaming.paletteColors.forEach(color => {
+            color.level = paletteLevels[color.index] ?? 0;
+            gaming.totalPaletteLevels += color.level;
+        });
+        gaming.paletteLoreBonusMultiplier = (spelunkingData[0]?.[8] ?? 0) >= 1 ? 1.5 : 1;
 
         gaming.importBoxes.forEach(box => {
             const dataIndex = 25+box.index;
@@ -211,8 +271,11 @@ export const updateGaming = (data: Map<string, any>) => {
     const bribes = data.get("bribes") as Bribe[];
     const arcade = data.get("arcade") as Arcade;
     const islandExpeditions = data.get("islandExpeditions") as IslandExpeditions;
+    const legendTalents = data.get("legendTalents") as LegendTalents;
 
     gaming.equinoxBonusToNuggets = Math.max(1, (equinox.upgrades[7] as MetalDetector).getTotalBonus());
+    gaming.paletteLegendTalentBonusMultiplier = 1 + legendTalents.getBonusFromIndex(10) / 100;
+    gaming.paletteBonusMultiplier = gaming.paletteLegendTalentBonusMultiplier * gaming.paletteLoreBonusMultiplier;
 
     gaming.bribeBonusToShovelSpeed = bribes.find(bribe => bribe.bribeIndex == 37)?.value ?? 0;
     gaming.islandExpeditionBonusToShovelSpeed = islandExpeditions.bonusToShovelSpeed;
