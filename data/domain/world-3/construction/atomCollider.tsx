@@ -13,6 +13,7 @@ import { Grimoire } from '../../grimoire';
 import { Compass } from '../../compass';
 import { Bubba } from '../bubba';
 import { EventShop } from '../../eventShop';
+import { Gaming } from '../../world-5/gaming';
 
 export class Atom {
     level: number = 0;
@@ -189,6 +190,7 @@ export function updateAtomCollider(data: Map<string, any>) {
     const compass = data.get("compass") as Compass;
     const bubba = data.get("bubba") as Bubba;
     const eventShop = data.get("eventShop") as EventShop;
+    const gaming = data.get("gaming") as Gaming;
 
     (collider.atoms[0] as HydrogenAtom).daysSinceUpgrade = optLacc[134];
     (collider.atoms[5] as CarbonAtom).wizardTowersOver50 = construction.buildings.slice(9, 18).reduce((sum, tower) => sum += Math.max(0, tower.level - 50), 0);
@@ -200,8 +202,7 @@ export function updateAtomCollider(data: Map<string, any>) {
     // Not using getBonus here since Lava says the bonus is 5 but it's really 7.
     const meritBonus = (taskBoard.merits.find(merit => merit.descLine1.includes("reduction in Atom Upgrade Costs"))?.level ?? 0) * 7;
     const stampBonus = getStampBonusForKey(stamps, "AtomCost");
-    // TODO : update this once palette have been added
-    const paletteBonus35 = 0;
+    const paletteBonus35 = gaming.getPaletteBonus(35);
     const grimoireBonus51 = grimoire.getUpgradeBonus(51);
     const compassBonus50 = compass.getUpgradeBonus(50);
     const bubbaBonus7 = bubba.getGlobalBonus(7);

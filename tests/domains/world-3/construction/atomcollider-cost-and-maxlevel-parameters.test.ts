@@ -47,11 +47,9 @@ const parameterSpecs = {
   palette_bonus_35: {
     description: 'Palette bonus 35 (atom cost reduction)',
     extractionKey: 'palette_bonus_35',
-    domainExtractor: (_gameData: Map<string, any>) => {
-      // TODO: This feature is not yet implemented in the domain
-      // Game function: GamingStatType("PaletteBonus", 35, 0)
-      // This test will fail until gaming palette is added to the domain
-      throw new Error("palette_bonus_35: NOT IMPLEMENTED - gaming palette feature missing from domain");
+    domainExtractor: (gameData: Map<string, any>) => {
+      const gaming = gameData.get("gaming") as Gaming;
+      return gaming.getPaletteBonus(35);
     }
   },
 

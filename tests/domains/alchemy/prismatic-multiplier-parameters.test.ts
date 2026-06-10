@@ -16,6 +16,7 @@ import { Arcade } from '../../../data/domain/world-2/arcade';
 import { Slab } from '../../../data/domain/world-5/slab';
 import { LegendTalents } from '../../../data/domain/world-7/legendTalents';
 import { Sigils } from '../../../data/domain/world-2/alchemy/sigils';
+import { Gaming } from '../../../data/domain/world-5/gaming';
 
 const saveName = 'latest';
 const extractionResultsName = 'alchemy-prismatic-multiplier-data.json';
@@ -52,11 +53,9 @@ const parameterSpecs = {
   palette_bonus_28: {
     description: 'Gaming palette bonus 28',
     extractionKey: 'palette_bonus_28',
-    domainExtractor: (_gameData: Map<string, any>) => {
-      // TODO: This feature is not yet implemented in the domain
-      // Game function: GamingStatType("PaletteBonus", 28, 0)
-      // This test will fail until gaming palette is added to the domain
-      throw new Error("palette_bonus_28: NOT IMPLEMENTED - gaming palette feature missing from domain");
+    domainExtractor: (gameData: Map<string, any>) => {
+      const gaming = gameData.get("gaming") as Gaming;
+      return gaming.getPaletteBonus(28);
     }
   },
 

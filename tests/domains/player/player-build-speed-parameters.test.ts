@@ -14,6 +14,7 @@ import type { Bubba } from '../../../data/domain/world-3/bubba';
 import type { AtomCollider } from '../../../data/domain/world-3/construction/atomCollider';
 import type { Storage } from '../../../data/domain/storage';
 import type { Summoning } from '../../../data/domain/world-6/summoning';
+import type { Gaming } from '../../../data/domain/world-5/gaming';
 import { lavaLog } from '../../../data/utility';
 
 const saveName = 'latest';
@@ -137,12 +138,9 @@ const parameterSpecs = {
   palette_bonus_25: {
     description: 'Gaming palette bonus 25',
     extractionKey: 'palette_bonus_25',
-    domainExtractor: (_gameData: Map<string, any>) => {
-      // TODO: This feature is not yet implemented in the domain
-      // Game function: GamingStatType("PaletteBonus", 25, 0)
-      // Currently hardcoded as 17 in the domain (line 1472)
-      // This test will fail until gaming palette is properly implemented
-      throw new Error("palette_bonus_25: NOT IMPLEMENTED - GamingStatType('PaletteBonus', 25, 0) not yet implemented in gaming domain");
+    domainExtractor: (gameData: Map<string, any>) => {
+      const gaming = gameData.get("gaming") as Gaming;
+      return gaming.getPaletteBonus(25);
     }
   },
   gear_bonus_etc_bonuses_30: {

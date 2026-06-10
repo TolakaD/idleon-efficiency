@@ -29,6 +29,7 @@ import { Arcade } from '../arcade';
 import { LegendTalent, LegendTalents } from '../../world-7/legendTalents';
 import { Sigils } from './sigils';
 import type { Farming } from '../../world-6/farming';
+import { Gaming } from '../../world-5/gaming';
 
 export enum CauldronIndex {
     Power = 0,
@@ -950,6 +951,7 @@ export function updateAlchemy(data: Map<string, any>) {
     const legendTalents = data.get("legendTalents") as LegendTalents;
     const sigils = data.get("sigils") as Sigils;
     const farming = data.get("farming") as Farming;
+    const gaming = data.get("gaming") as Gaming
 
     const vaultBonus42 = vault.getBonusForId(42);
     const labBonusActive = lab.bonuses.find(bonus => bonus.name == "My 1st Chemistry Set")?.active ?? false;
@@ -1022,8 +1024,7 @@ export function updateAlchemy(data: Map<string, any>) {
     const arcaneBonus45 = tesseract.getUpgradeBonus(45);
     const arcadeBonus54 = arcade.bonuses[54] ? arcade.bonuses[54].getBonus() : 0;
     const world6TrophyBonus = world6Trophy?.obtained ? 10 : 0;
-    // TODO : update this once gaming have palette added
-    const paletteBonus28 = 0;
+    const paletteBonus28 = gaming.getPaletteBonus(28);
     const legendBonus36 = legendTalents.getBonusFromIndex(36);
     const purpleSigilsBonus = sigils.sigils.reduce((sum, sigil) => sum += (sigil.boostLevel >= 4 ? 1: 0), 0);
     const exoticMarketBonus48 = farming.getExoticMarketBonusValue(48);
