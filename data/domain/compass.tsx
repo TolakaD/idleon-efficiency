@@ -933,7 +933,7 @@ export class Compass extends Domain implements EfficiencyDomain {
     public copyDomain(upgrades: CompassUpgrade[], availableDust: Record<DustType, number>): Compass {
         const tempCompass = new Compass("compass");
         
-        // Copy upgrades and recalculate
+        // Callers pass upgrades after applying any simulated level changes and recalculating bonuses/costs.
         tempCompass.upgrades = upgrades;
         tempCompass.upgradeMetadata = this.upgradeMetadata;
         
@@ -957,9 +957,6 @@ export class Compass extends Domain implements EfficiencyDomain {
         tempCompass.arcadeBonus47 = this.arcadeBonus47;
         tempCompass.emperorBonus4 = this.emperorBonus4;
         tempCompass.mainframeBonus122 = this.mainframeBonus122;
-        
-        // Recalculate upgrades for the temporary compass
-        tempCompass.recalculateUpgrades(upgrades);
         
         return tempCompass;
     }

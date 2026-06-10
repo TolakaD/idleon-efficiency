@@ -238,6 +238,11 @@ export class GrimoireUpgrade implements EfficiencyUpgrade {
     }
 
     getCostToMax = (allUpgrades: GrimoireUpgrade[]): number => {
+        // Don't calculate cost to max for uncapped upgrades
+        if (this.getMaxLevel() >= 999999) {
+            return 0;
+        }
+
         let totalCost = 0;
         const tempUpgrade = this.copyUpgrade() as GrimoireUpgrade; 
 
@@ -862,14 +867,7 @@ export class Grimoire extends Domain implements EfficiencyDomain {
         grimoire.upgrades.forEach(upgrade => {
             upgrade.bonus = upgrade.getBonus(grimoire.upgrades);
             upgrade.cost = upgrade.getCost(grimoire.upgrades);
-
-            // For upgrades with very high max levels, we don't need to calculate cost to max
-            // as it would be an astronomical number and not useful for players
-            if (upgrade.getMaxLevel() >= 999999) {
-                upgrade.costToMax = 0; // Set to 0 as we won't use this value
-            } else {
-                upgrade.costToMax = upgrade.getCostToMax(grimoire.upgrades);
-            }
+            upgrade.costToMax = upgrade.getCostToMax(grimoire.upgrades);
         });
     }
 } 
