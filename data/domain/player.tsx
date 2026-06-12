@@ -48,6 +48,7 @@ import { Bubba } from './world-3/bubba';
 import { AtomCollider } from './world-3/construction/atomCollider';
 import { Summoning } from './world-6/summoning';
 import { Construction } from './world-3/construction/construction';
+import { Gaming } from './world-5/gaming';
 
 export class PlayerStats {
     strength: number = 0;
@@ -1409,6 +1410,7 @@ export const playerExtraCalculations = (data: Map<string, any>) => {
     const atomCollider = data.get("collider") as AtomCollider;
     const summoning = data.get("summoning") as Summoning;
     const construction = data.get("construction") as Construction;
+    const gaming = data.get("gaming") as Gaming;
 
     const skillMastery = rift.bonuses.find(bonus => bonus.name == "Construct Mastery") as ConstructionMastery;
 
@@ -1467,8 +1469,7 @@ export const playerExtraCalculations = (data: Map<string, any>) => {
     const atomCollider1 = atomCollider.atoms.find(atom => atom.index == 1)?.getBonus() || 0;
     const redoxSaltsOwned = storage.amountInStorage("Refinery1");
     const winnerBonus13 = summoning.summonBonuses.find(bonus => bonus.index == 13)?.getBonus() || 0;
-    // TODO : add this once gaming have been updated with palette
-    const paletteBonus25 = 0;
+    const paletteBonus25 = gaming.getPaletteBonus(25);
 
     // Apply everything to players
     players.forEach(player => {

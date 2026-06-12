@@ -9,6 +9,7 @@ import { EventShop } from "../eventShop";
 import { initVoteBonusRepo, VoteBonusBase } from "../data/VoteBonusRepo";
 import { VoteBonusModel } from "../model/voteBonusModel";
 import { Meritocraty } from "../world-7/meritocraty";
+import { Gaming } from "../world-5/gaming";
 
 export class Votes extends Domain {
     multiFromBonuses: number = 0;
@@ -85,6 +86,7 @@ export const updateVotesBonus = (data: Map<string, any>) => {
     const legendTalents = data.get("legendTalents") as LegendTalents;
     const eventShop = data.get("eventShop") as EventShop;
     const meritocraty = data.get("meritocraty") as Meritocraty;
+    const gaming = data.get("gaming") as Gaming;
 
     const companion41 = companions.find(companion => companion.id == 41);
     const multiFromCompanion41 = companion41?.owned || false ? companion41.data.bonus : 0;
@@ -95,8 +97,7 @@ export const updateVotesBonus = (data: Map<string, any>) => {
     const multiFromSUmmoningWinningBonus22 = summoning.summonBonuses.find(bonus => bonus.index == 22)?.getBonus() ?? 0;
     const multiFromEventShop7 = eventShop.isBonusOwned(7) ? 17 : 0;
     const multiFromEventShop16 = eventShop.isBonusOwned(16) ? 13 : 0;
-    // TODO : update this once gaming palette is added
-    const multiFromGamingPalette32 = 0;
+    const multiFromGamingPalette32 = gaming.getPaletteBonus(32);
     const multiFromLegendTalents22 = legendTalents.getBonusFromIndex(22);
 
     const multiFromMeritocraty9 = meritocraty.getCurrentBonus(9);
