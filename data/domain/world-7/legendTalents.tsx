@@ -20,7 +20,9 @@ export class LegendTalent {
     }
 
     getBonus = (level: number = this.level): number => {
-        return level * this.data.bonusValue;
+        return this.data.name == "filler" 
+            ? 0 
+            : level * this.data.bonusValue;
     }
 
     getSecondaryValue = (level: number = this.level): string => {
