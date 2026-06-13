@@ -484,8 +484,9 @@ export class Player {
         const totalAdditivePoints = stampsBonusBuildProd + postOfficeBonus + guildBonus5 + gearBonus + achievement153 + constructionMasteryBonus + vialBonusContspd +
             arcadeBonus44 + votingBonus18 + vaultBonus + bubbaBonus1;
         const additiveBonuses = 1 + totalAdditivePoints / 100;
+        const accountMultipliers = winnerBonus * paletteBonus * vialTurtleBonus;
 
-        const totalSpeed = baseSpeed * bubbleBonus * additiveBonuses * winnerBonus * paletteBonus * vialTurtleBonus * talentBonus;
+        const totalSpeed = baseSpeed * bubbleBonus * additiveBonuses * accountMultipliers * talentBonus;
         this.buildSpeed.value = totalSpeed;
         const totalBonusSpeed = totalSpeed - baseSpeed;
 
