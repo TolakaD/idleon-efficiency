@@ -54,12 +54,6 @@ export class Talent {
         return this.getBonusAtLevel(maxBonus ? this.maxLevel : this.level, round, yBonus);
     }
 
-    // Confirmed to be needed for the 'Redox Rates' talent (131)
-    // Other potential talents are: 42, 43, 78, 132, 281, 491,493
-    getBonusFromPointsSpent = (round: boolean = false, yBonus: boolean = false) => {
-        return this.getBonusAtLevel(this.pointsSpent, round, yBonus);
-    }
-
     getBonusText = (): string => {
         const xBonus = this.getBonus(true);
         const yBonus = this.getBonus(true, true);
@@ -101,6 +95,8 @@ export class Talent {
         switch(talentInfo.skillIndex) {
             case 59:
                 return new BloodMarrowTalent(talentName, talentInfo);
+            case 131:
+                return new RedoxRatesTalent(talentName, talentInfo);
             case 146:
                 return new ApocalypseChowTalent(talentName, talentInfo);
             default:
@@ -121,6 +117,13 @@ export class BloodMarrowTalent extends Talent {
 
     override getBonusText = (): string => {
         return `${this.getBonus()}% - ${this.totalMeals} Meals`;
+    }
+}
+
+// Other potential talents with this logic are: 42, 43, 78, 132, 281, 491,493
+export class RedoxRatesTalent extends Talent {
+    override getBonus = (round: boolean = false, yBonus: boolean = false) => {
+        return super.getBonusAtLevel(this.pointsSpent, round, yBonus);
     }
 }
 

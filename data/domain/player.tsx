@@ -465,7 +465,7 @@ export class Player {
         vialBonusContspd: number, turtleVialBonus: number, arcadeBonus44: number, votingBonus18: number, vaultUpgrade48: number, sheepiesKilled: number,
         bubbaBonus1: number, atomCollider1: number, redoxSaltInStorage: number, winnerBonus13: number, paletteBonus25: number) => {
         const constructionLevel = this.skills.get(SkillsIndex.Construction)?.level || 0;
-        const redoxSaltTalentBonus = this.talents.find(x => x.skillIndex == 131)?.getBonusFromPointsSpent() ?? 0;
+        const redoxSaltTalentBonus = this.talents.find(x => x.skillIndex == 131)?.getBonus() ?? 0;
         let postOfficeBonus = 0;
         if (this.postOffice) {
             const constructionBox = this.postOffice.find(box => box.name == "Construction Container");
